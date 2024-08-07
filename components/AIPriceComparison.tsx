@@ -13,7 +13,6 @@ interface ModelPrices {
   };
 }
 
-
 interface CurrencyDropdownProps {
   value: string;
   onChange: (currency: string) => void;
@@ -288,22 +287,6 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
     }
   };
 
-  const handleDeleteModel = async (modelName: string) => {
-    try {
-      // Note: You'll need to implement a delete function in your Supabase utils
-      // await deleteModelPrice(modelName);
-      console.log('Deleting model:', modelName);
-      // For now, we'll just update the local state
-      setModelPrices(prev => {
-        const newModelPrices = { ...prev };
-        delete newModelPrices[modelName];
-        return newModelPrices;
-      });
-    } catch (error) {
-      console.error('Error deleting model:', error);
-    }
-  };
-
   const handleTokenChange = (setTokens: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) { // Only allow numeric values
@@ -366,7 +349,7 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <h2 className="text-xl font-semibold mb-4">Price Comparison-Highest to lowest</h2>
+        <h2 className="text-xl font-semibold mb-4">Price Comparison - Highest to Lowest</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -397,19 +380,11 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
                   <td className="p-2 text-center">
                     <motion.button
                       onClick={() => setEditingModel({ name: model, ...prices })}
-                      className="mr-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
                       Edit
-                    </motion.button>
-                    <motion.button
-                      onClick={() => handleDeleteModel(model)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Delete
                     </motion.button>
                   </td>
                 </motion.tr>

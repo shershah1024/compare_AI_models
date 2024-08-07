@@ -1,5 +1,3 @@
-// File: utils/supabase.ts
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -21,35 +19,48 @@ export const fetchModelPrices = async (): Promise<ModelPrice[]> => {
 };
 
 export const upsertModelPrice = async (model: {
-    name: string;
-    input: number;
-    output: number;
-    provider: string;
-  }): Promise<ModelPrice> => {
-    const { data, error } = await supabase
-      .rpc('upsert_model_price', {
-        p_model_name: model.name,
-        p_input_price: model.input,
-        p_output_price: model.output,
-        p_provider: model.provider
-      });
-  
-    if (error) throw error;
-    if (!data || data.length === 0) throw new Error('No data returned from upsert operation');
-    return data[0] as ModelPrice;
-  };
-  
-  
+  name: string;
+  input: number;
+  output: number;
+  provider: string;
+}): Promise<ModelPrice> => {
+  const { data, error } = await supabase
+    .rpc('upsert_model_price', {
+      p_model_name: model.name,
+      p_input_price: model.input,
+      p_output_price: model.output,
+      p_provider: model.provider
+    });
 
-  export const subscribeToModelPrices = (callback: (payload: any) => void) => {
-    const channel = supabase.channel('custom-insert-channel')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'ai_model_prices' },
-        callback
-      )
-      .subscribe();
-  
-    return channel;
-  };
-  
+  if (error) throw error;
+  if (!data || data.length === 0) throw new Error('No data returned from upsert operation');
+  return data[0] as ModelPrice;
+};
+
+export const deleteModelPrice = async (modelName: string): Promise<void> => {
+  console.log('Attempting to delete model with name:', modelName); // Add this log
+
+  const { error, data } = await supabase
+    .from('ai_model_prices')
+    .delete()
+    .eq('model_name', modelName);
+
+  if (error) {
+    console.error('Error deleting model:', error); // Add this log
+    throw error;
+  }
+
+  console.log('Delete operation result:', data); // Add this log
+};
+
+export const subscribeToModelPrices = (callback: (payload: any) => void) => {
+  const channel = supabase.channel('custom-insert-channel')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'ai_model_prices' },
+      callback
+    )
+    .subscribe();
+
+  return channel;
+};
