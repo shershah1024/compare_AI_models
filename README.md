@@ -2,12 +2,14 @@
 
 This project provides a user interface for comparing AI model pricing from various providers. It uses Supabase for the backend and real-time updates, and Framer Motion for animations.
 
+![App Page](https://rvwyqbyxqenenohwlytj.supabase.co/storage/v1/object/public/site_files/app%20page.png?t=2024-08-07T08%3A08%3A54.611Z)
+
 ## Getting Started
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/en/download/) (LTS version recommended)
-- [Supabase](https://supabase.io/)
+- [Supabase](https://supabase.com/)
 - [ExchangeRates API Key](https://apilayer.com/marketplace/exchangerates_data-api)
 
 ### Installation
@@ -15,13 +17,13 @@ This project provides a user interface for comparing AI model pricing from vario
 1. **Clone the Repository**
 
     ```sh
-    git clone https://github.com/your-username/ai-model-price-comparison.git
+    git clone https://github.com/shershah1024/ai-model-price-comparison.git
     cd ai-model-price-comparison
     ```
 
 2. **Create a Project on Supabase**
 
-    - Go to [Supabase](https://app.supabase.io/) and create a new project.
+    - Go to [Supabase](https://supabase.com/) and create a new project.
     - Get your Supabase URL and Anon Key from the project settings.
 
 3. **Run SQL Functions and Create Tables**
@@ -29,6 +31,9 @@ This project provides a user interface for comparing AI model pricing from vario
     - Go to the SQL Editor in Supabase and run the following SQL to create the required table and functions:
 
     ```sql
+    -- Select all users from auth.users
+    SELECT * FROM auth.users;
+
     -- Create the table to store AI model pricing data
     CREATE TABLE ai_model_prices (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
