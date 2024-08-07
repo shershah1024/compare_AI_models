@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchModelPrices, upsertModelPrice, subscribeToModelPrices, ModelPrice } from '../utils/supabase';
+import { fetchModelPrices, upsertModelPrice, subscribeToModelPrices } from '../utils/supabase';
 
 interface ModelPrices {
   [key: string]: {
@@ -21,14 +21,11 @@ interface CurrencyDropdownProps {
 
 const formatPrice = (price: number): string => {
   if (price === 0) return '0';
-
   let formattedPrice = price.toFixed(3);
   formattedPrice = formattedPrice.replace(/\.?0+$/, '');
-
   if (formattedPrice.endsWith('.')) {
     formattedPrice = formattedPrice.slice(0, -1);
   }
-
   return formattedPrice;
 };
 
@@ -85,12 +82,12 @@ const CurrencyDropdown: React.FC<CurrencyDropdownProps> = ({ value, onChange, cu
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
         placeholder="Search currency..."
-        className="w-full p-2 border rounded"
+        className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
       />
       <AnimatePresence>
         {isOpen && (
           <motion.ul
-            className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg max-h-60 overflow-auto"
+            className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-auto"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -102,8 +99,8 @@ const CurrencyDropdown: React.FC<CurrencyDropdownProps> = ({ value, onChange, cu
                   onChange(currency);
                   setSearch('');
                 }}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
-                whileHover={{ backgroundColor: '#f0f0f0' }}
+                className="p-2 hover:bg-blue-100 cursor-pointer text-gray-900"
+                whileHover={{ backgroundColor: '#EBF8FF' }}
               >
                 {currency}
               </motion.li>
@@ -134,30 +131,30 @@ const ModelForm: React.FC<ModelFormProps> = ({ onSubmit, initialData = { name: '
     e.preventDefault();
     await onSubmit(model);
     setModel({ name: '', input: 0, output: 0, provider: '' });
-    window.location.reload(); // Refresh the page
+    window.location.reload();
   };
 
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="grid gap-4 sm:grid-cols-1 md:grid-cols-5"
+      className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
       <div className="flex flex-col">
-        <label htmlFor="modelName" className="mb-1 text-sm font-medium">Model Name</label>
+        <label htmlFor="modelName" className="mb-1 text-sm font-medium text-gray-900">Model Name</label>
         <input
           id="modelName"
           type="text"
           value={model.name}
           onChange={(e) => setModel({ ...model, name: e.target.value })}
           required
-          className="p-2 border rounded"
+          className="p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
         />
       </div>
       <div className="flex flex-col">
-        <label htmlFor="inputPrice" className="mb-1 text-sm font-medium">Input Price/ Million Tokens(USD)</label>
+        <label htmlFor="inputPrice" className="mb-1 text-sm font-medium text-gray-900">Input Price/ Million Tokens(USD)</label>
         <input
           id="inputPrice"
           type="number"
@@ -166,11 +163,11 @@ const ModelForm: React.FC<ModelFormProps> = ({ onSubmit, initialData = { name: '
           placeholder="Input Price per 1M tokens"
           required
           step="0.001"
-          className="p-2 border rounded"
+          className="p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
         />
       </div>
       <div className="flex flex-col">
-        <label htmlFor="outputPrice" className="mb-1 text-sm font-medium">Output Price/ Million TKS(USD)</label>
+        <label htmlFor="outputPrice" className="mb-1 text-sm font-medium text-gray-900">Output Price/ Million TKS(USD)</label>
         <input
           id="outputPrice"
           type="number"
@@ -179,23 +176,23 @@ const ModelForm: React.FC<ModelFormProps> = ({ onSubmit, initialData = { name: '
           placeholder="Output Price per 1M tokens"
           required
           step="0.001"
-          className="p-2 border rounded"
+          className="p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
         />
       </div>
       <div className="flex flex-col">
-        <label htmlFor="provider" className="mb-1 text-sm font-medium">Provider</label>
+        <label htmlFor="provider" className="mb-1 text-sm font-medium text-gray-900">Provider</label>
         <input
           id="provider"
           type="text"
           value={model.provider}
           onChange={(e) => setModel({ ...model, provider: e.target.value })}
           required
-          className="p-2 border rounded"
+          className="p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
         />
       </div>
       <motion.button
         type="submit"
-        className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 self-end"
+        className="p-2 sm:p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-semibold text-lg col-span-full"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -289,88 +286,88 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
 
   const handleTokenChange = (setTokens: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) { // Only allow numeric values
+    if (/^\d*$/.test(value)) {
       setTokens(value);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 sm:p-6 bg-gray-100">
       <motion.h1
-        className="text-3xl font-bold mb-6 text-center"
+        className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-900 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         AI Model Price Comparison
       </motion.h1>
-
+  
       <motion.div className="text-center mb-4">
         <a 
           href="https://github.com/shershah1024/compare_AI_models" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="text-blue-500 hover:underline"
+          className="text-blue-600 hover:text-blue-800 underline text-lg"
         >
           View on GitHub
         </a>
       </motion.div>
-
+  
       <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6"
+        className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-4 sm:mb-6 border-t-4 border-blue-600"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <h2 className="text-xl font-semibold mb-4">Token Input</h2>
-        <p className="mb-4 text-gray-600">Enter the number of tokens you want to process. This will be used to calculate the price for each model.</p>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900">Token Input</h2>
+        <p className="mb-3 sm:mb-4 text-gray-700">Enter the number of tokens you want to process. This will be used to calculate the price for each model.</p>
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
           <div>
-            <label htmlFor="inputTokens" className="block mb-2">Input Tokens:</label>
+            <label htmlFor="inputTokens" className="block mb-1 sm:mb-2 text-gray-900 font-medium">Input Tokens:</label>
             <input
               id="inputTokens"
               type="text"
               value={inputTokens}
               onChange={handleTokenChange(setInputTokens)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
             />
-            <p className="mt-1 text-sm text-gray-500">{numberToWords(parseInt(inputTokens) || 0)} tokens</p>
+            <p className="mt-1 text-sm text-gray-600">{numberToWords(parseInt(inputTokens) || 0)} tokens</p>
           </div>
           <div>
-            <label htmlFor="outputTokens" className="block mb-2">Output Tokens:</label>
+            <label htmlFor="outputTokens" className="block mb-1 sm:mb-2 text-gray-900 font-medium">Output Tokens:</label>
             <input
               id="outputTokens"
               type="text"
               value={outputTokens}
               onChange={handleTokenChange(setOutputTokens)}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900"
             />
-            <p className="mt-1 text-sm text-gray-500">{numberToWords(parseInt(outputTokens) || 0)} tokens</p>
+            <p className="mt-1 text-sm text-gray-600">{numberToWords(parseInt(outputTokens) || 0)} tokens</p>
           </div>
           <div>
-            <label htmlFor="currency" className="block mb-2">Currency:</label>
+            <label htmlFor="currency" className="block mb-1 sm:mb-2 text-gray-900 font-medium">Currency:</label>
             <CurrencyDropdown value={currency} onChange={setCurrency} currencies={currencies} />
           </div>
         </div>
       </motion.div>
-
+  
       <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6 overflow-x-auto"
+        className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-4 sm:mb-6 border-t-4 border-blue-600"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <h2 className="text-xl font-semibold mb-4">Price Comparison - Highest to Lowest</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900">Price Comparison - Highest to Lowest</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2 text-left">Model</th>
-                <th className="p-2 text-left">Provider</th>
-                <th className="p-2 text-right">Input Price</th>
-                <th className="p-2 text-right">Output Price</th>
-                <th className="p-2 text-right">Total Price</th>
-                <th className="p-2 text-center">Actions</th>
+              <tr className="bg-blue-100">
+                <th className="p-2 sm:p-3 text-left text-gray-900 font-semibold">Model</th>
+                <th className="p-2 sm:p-3 text-left text-gray-900 font-semibold">Provider</th>
+                <th className="p-2 sm:p-3 text-right text-gray-900 font-semibold">Input Price</th>
+                <th className="p-2 sm:p-3 text-right text-gray-900 font-semibold">Output Price</th>
+                <th className="p-2 sm:p-3 text-right text-gray-900 font-semibold">Total Price</th>
+                <th className="p-2 sm:p-3 text-center text-gray-900 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -381,17 +378,17 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="border-b"
+                  className="border-b border-gray-200"
                 >
-                  <td className="p-2">{model}</td>
-                  <td className="p-2">{prices.provider}</td>
-                  <td className="p-2 text-right">{calculatePrice(model, 'input')} {currency}</td>
-                  <td className="p-2 text-right">{calculatePrice(model, 'output')} {currency}</td>
-                  <td className="p-2 text-right">{calculateTotalPrice(model)} {currency}</td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 sm:p-3 text-gray-900">{model}</td>
+                  <td className="p-2 sm:p-3 text-gray-900">{prices.provider}</td>
+                  <td className="p-2 sm:p-3 text-right text-gray-900">{calculatePrice(model, 'input')} {currency}</td>
+                  <td className="p-2 sm:p-3 text-right text-gray-900">{calculatePrice(model, 'output')} {currency}</td>
+                  <td className="p-2 sm:p-3 text-right text-gray-900">{calculateTotalPrice(model)} {currency}</td>
+                  <td className="p-2 sm:p-3 text-center">
                     <motion.button
                       onClick={() => setEditingModel({ name: model, ...prices })}
-                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm sm:text-base"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -404,22 +401,22 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
           </table>
         </div>
       </motion.div>
-
+  
       <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6"
+        className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-4 sm:mb-6 border-t-4 border-blue-600"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
         <motion.button
           onClick={() => setIsAddModelOpen(!isAddModelOpen)}
-          className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 mb-4"
+          className="w-full p-2 sm:p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-semibold text-lg"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           {isAddModelOpen ? 'Close Add Model' : 'Add New Model'}
         </motion.button>
-
+  
         <AnimatePresence>
           {isAddModelOpen && (
             <motion.div
@@ -429,29 +426,28 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-xl font-semibold mb-4">Add New Model</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900">Add New Model</h2>
               <ModelForm onSubmit={handleAddModel} />
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
-
+  
       <AnimatePresence>
         {editingModel && (
           <motion.div
-            className="bg-white p-6 rounded-lg shadow-md mb-6"
+            className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-4 sm:mb-6 border-t-4 border-blue-600"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className="text-xl font-semibold mb-4">Edit Model: {editingModel.name}</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900">Edit Model: {editingModel.name}</h2>
             <ModelForm onSubmit={handleEditModel} initialData={editingModel} />
           </motion.div>
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  );}
 
-export default AIPriceComparison;
+  export default AIPriceComparison;
