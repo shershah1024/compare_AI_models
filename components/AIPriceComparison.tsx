@@ -305,6 +305,17 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
         AI Model Price Comparison
       </motion.h1>
 
+      <motion.div className="text-center mb-4">
+        <a 
+          href="https://github.com/shershah1024/compare_AI_models" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-blue-500 hover:underline"
+        >
+          View on GitHub
+        </a>
+      </motion.div>
+
       <motion.div
         className="bg-white p-6 rounded-lg shadow-md mb-6"
         initial={{ opacity: 0, y: 20 }}
