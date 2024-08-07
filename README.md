@@ -1,94 +1,119 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# AI Model Price Comparison
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+This project provides a user interface for comparing AI model pricing from various providers. It uses Supabase for the backend and real-time updates, and Framer Motion for animations.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## Getting Started
 
-## Features
+### Prerequisites
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- [Node.js](https://nodejs.org/en/download/) (LTS version recommended)
+- [Supabase](https://supabase.io/)
+- [ExchangeRates API Key](https://apilayer.com/marketplace/exchangerates_data-api)
 
-## Demo
+### Installation
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+1. **Clone the Repository**
 
-## Deploy to Vercel
+    ```sh
+    git clone https://github.com/your-username/ai-model-price-comparison.git
+    cd ai-model-price-comparison
+    ```
 
-Vercel deployment will guide you through creating a Supabase account and project.
+2. **Create a Project on Supabase**
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+    - Go to [Supabase](https://app.supabase.io/) and create a new project.
+    - Get your Supabase URL and Anon Key from the project settings.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This%20starter%20configures%20Supabase%20Auth%20to%20use%20cookies%2C%20making%20the%20user's%20session%20available%20throughout%20the%20entire%20Next.js%20app%20-%20Client%20Components%2C%20Server%20Components%2C%20Route%20Handlers%2C%20Server%20Actions%20and%20Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6)
+3. **Run SQL Functions and Create Tables**
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+    - Go to the SQL Editor in Supabase and run the following SQL to create the required table and functions:
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+    ```sql
+    -- Create the table to store AI model pricing data
+    CREATE TABLE ai_model_prices (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      model_name TEXT NOT NULL UNIQUE,
+      input_price NUMERIC(10, 6) NOT NULL,
+      output_price NUMERIC(10, 6) NOT NULL,
+      provider TEXT NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
 
-## Clone and run locally
+    -- Enable row-level security
+    ALTER TABLE ai_model_prices ENABLE ROW LEVEL SECURITY;
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+    -- Create a policy to allow all operations (adjust as needed for your security requirements)
+    CREATE POLICY "Allow all operations for authenticated users" ON ai_model_prices
+      FOR ALL USING (auth.role() = 'authenticated');
 
-2. Create a Next.js app using the Supabase Starter template npx command
+    -- Function to insert or update a model's pricing data
+    CREATE OR REPLACE FUNCTION upsert_model_price(
+      p_model_name TEXT,
+      p_input_price NUMERIC,
+      p_output_price NUMERIC,
+      p_provider TEXT
+    ) RETURNS SETOF ai_model_prices AS $$
+    BEGIN
+      RETURN QUERY
+      INSERT INTO ai_model_prices (model_name, input_price, output_price, provider)
+      VALUES (p_model_name, p_input_price, p_output_price, p_provider)
+      ON CONFLICT (model_name) 
+      DO UPDATE SET 
+        input_price = EXCLUDED.input_price,
+        output_price = EXCLUDED.output_price,
+        provider = EXCLUDED.provider,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *;
+    END;
+    $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-   ```bash
-   npx create-next-app -e with-supabase
-   ```
+    -- Enable real-time subscriptions for the table
+    ALTER PUBLICATION supabase_realtime ADD TABLE ai_model_prices;
+    ```
 
-3. Use `cd` to change into the app's directory
+    - You can find the SQL Editor in Supabase as shown in the image below:
 
-   ```bash
-   cd name-of-new-app
-   ```
+    ![Supabase SQL Editor](https://rvwyqbyxqenenohwlytj.supabase.co/storage/v1/object/public/site_files/supabase_sql.png?t=2024-08-07T06%3A52%3A36.319Z)
 
-4. Rename `.env.local.example` to `.env.local` and update the following:
+4. **Get the ExchangeRates API Key**
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+    - Go to [ExchangeRates Data API](https://apilayer.com/marketplace/exchangerates_data-api) and sign up to get your API key.
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+5. **Configure Environment Variables**
 
-5. You can now run the Next.js local development server:
+    - Rename `.env.local.example` to `.env.local` and fill in your Supabase URL, Anon Key, and ExchangeRates API Key:
 
-   ```bash
-   npm run dev
-   ```
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+    NEXT_PUBLIC_EXCHANGE_RATES_API_KEY=your-exchange-rates-api-key
+    ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+6. **Install Dependencies**
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+    ```sh
+    npm install
+    ```
 
-## Feedback and issues
+7. **Run the Development Server**
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+    ```sh
+    npm run dev
+    ```
 
-## More Supabase examples
+    Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-# compare_AI_models
+## Usage
+
+- Add new AI model pricing data using the form.
+- Edit existing AI model pricing data.
+- View real-time updates of AI model pricing data as they are added or updated.
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
