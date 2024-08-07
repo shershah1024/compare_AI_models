@@ -140,7 +140,7 @@ const ModelForm: React.FC<ModelFormProps> = ({ onSubmit, initialData = { name: '
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="grid gap-4 md:grid-cols-5"
+      className="grid gap-4 sm:grid-cols-1 md:grid-cols-5"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -324,7 +324,7 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
       >
         <h2 className="text-xl font-semibold mb-4">Token Input</h2>
         <p className="mb-4 text-gray-600">Enter the number of tokens you want to process. This will be used to calculate the price for each model.</p>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
           <div>
             <label htmlFor="inputTokens" className="block mb-2">Input Tokens:</label>
             <input
