@@ -355,7 +355,7 @@ const AIPriceComparison: React.FC<AIPriceComparisonProps> = ({ initialCurrencies
       </motion.div>
 
       <motion.div
-        className="bg-white p-6 rounded-lg shadow-md mb-6"
+        className="bg-white p-6 rounded-lg shadow-md mb-6 overflow-x-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
